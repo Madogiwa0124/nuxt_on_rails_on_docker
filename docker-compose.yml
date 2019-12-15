@@ -1,0 +1,42 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+  nuxt:
+    build:
+      context: .
+      dockerfile: ./docker/nuxt/Dockerfile
+      args:
+        - APP_NAME=nuxt-app-name
+    command: npm run dev
+    tty: true
+    ports:
+      - "8080:3000"
+    volumes:
+      - ./repos/nuxt-app-name:/nuxt-app-name
+    links:
+      - rails
+  rails:
+    build:
+      context: .
+      dockerfile: ./docker/rails/Dockerfile
+      args:
+        - APP_NAME=rails-app-name
+    command: bin/rails s -b 0.0.0.0 -p 3000
+    tty: true
+    ports:
+      - "3000:3000"
+    links:
+      - db
+    volumes:
+      - ./repos/rails-app-name:/rails-app-name
+    environment:
+      HOST_NAME: rails
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD:
+      DATABASE_PORT: 5432
+      DATABASE_HOST: db
