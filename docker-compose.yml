@@ -6,6 +6,19 @@ services:
       - "5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+  openapi-ui:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./repos/openapi:/openapi
+    ports:
+      - "8000:8080"
+    tty: true
+    environment:
+      SWAGGER_JSON: /openapi/openapi.yml
+  openapi-generator:
+    image: openapitools/openapi-generator-cli
+    volumes:
+      - ./repos/openapi:/openapi
   nuxt:
     build:
       context: .
